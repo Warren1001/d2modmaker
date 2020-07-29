@@ -27,7 +27,7 @@ copy_react_build:
 # copy the templates to bin
 copy_templates:
 	rm -rf bin/templates
-	cp -r templates bin/
+	cp -r templates bin/react-ui/build
 
 # batch all copies
 copy_files: copy_react_build copy_templates

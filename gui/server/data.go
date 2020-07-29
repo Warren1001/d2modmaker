@@ -20,8 +20,8 @@ type ViewData struct {
 }
 
 // NewViewData creates new data for the view
-func NewViewData(buildPath string) (ViewData, error) {
-	wp, err := webpack.New(buildPath)
+func NewViewData(isProduction bool, buildPath string) (ViewData, error) {
+	wp, err := webpack.New(isProduction, buildPath)
 
 	if err != nil {
 		return ViewData{}, fmt.Errorf("failed to read webpack configuration: %w", err)

@@ -18,7 +18,13 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/tlentz/d2modmaker/gui/api"
+	"github.com/tlentz/d2modmaker/gui/generated"
 	"github.com/tlentz/d2modmaker/gui/server"
+)
+
+var (
+	mode    string
+	version string
 )
 
 // spaHandler implements the http.Handler interface, so we can use it
@@ -64,14 +70,27 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	http.FileServer(http.Dir(h.staticPath)).ServeHTTP(w, r)
 }
 
-type ServerConfig struct {
-	port      string `json:"port"`      // port for the server to listen on
-	buildPath string `json:"buildPath"` // create-react-app
-}
+// type ServerConfig struct {
+// 	port string `json:"port"` // port for the server to listen on
+// }
 
 func main() {
-	cfg := ServerConfig{port: "8148", buildPath: path.Clean("react-ui/build")}
-	staticPath := path.Join(cfg.buildPath, "/static/")
+	port := "8148"
+	buildPath := "react-ui/build"
+	mode = "production"
+	isProduction := mode == "production"
+	fmt.Println("Is Production :: ", isProduction)
+	if isProduction {
+		buildPath = "/"
+	}
+	buildPath = path.Clean(buildPath)
+	staticPath := path.Join(buildPath, "/static/")
+	var staticDir http.FileSystem
+	if isProduction {
+		staticDir = generated.ReactAssets
+	} else {
+		staticDir = http.Dir(staticPath)
+	}
 	r := mux.NewRouter()
 
 	r.HandleFunc("/api/health", func(w http.ResponseWriter, r *http.Request) {
@@ -82,16 +101,16 @@ func main() {
 	r.HandleFunc("/api/run", api.RunHandler()).Methods("POST")
 
 	// This will serve files under http://localhost:<port>/static/<filename>
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(staticPath))))
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(staticDir)))
 	// react app
-	r.PathPrefix("/").Handler(server.Handler(cfg.buildPath))
+	r.PathPrefix("/").Handler(server.Handler(isProduction, buildPath))
 
 	// add logging
 	loggedRouter := handlers.LoggingHandler(os.Stdout, r)
 
 	srv := &http.Server{
 		Handler: loggedRouter,
-		Addr:    "127.0.0.1:" + cfg.port,
+		Addr:    "127.0.0.1:" + port,
 		// Good practice: enforce timeouts for servers you create!
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
@@ -104,7 +123,7 @@ func main() {
 	}()
 
 	// launch the browser
-	openBrowser("http://localhost:" + cfg.port + "/")
+	openBrowser("http://localhost:" + port + "/")
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
