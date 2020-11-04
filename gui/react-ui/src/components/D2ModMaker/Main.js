@@ -46,6 +46,7 @@ const defaultCfg = {
     MaxProps: 20,
     PerfectProps: false,
     UseOSkills: true,
+	RandomizeMonsters: false,
   },
 };
 
@@ -516,6 +517,17 @@ export default function D2ModMaker() {
             })}
           </Grid>
         </Grid>
+		
+		<Grid container>
+          <Grid item xs={12}>
+            {mkRandoCheckbox({
+              key: "RandomizeMonsters",
+              tooltip:
+                "Randomizes monsters.",
+            })}
+          </Grid>
+        </Grid>
+		
         <Grid item xs={12} className={"SliderWrapper"}>
           <Typography
             id="MinProps"

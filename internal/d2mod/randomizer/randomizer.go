@@ -78,6 +78,7 @@ func getRandomOptions(cfg *config.Data) config.RandomOptions {
 	}
 	defaultCfg.PerfectProps = cfg.RandomOptions.PerfectProps
 	defaultCfg.UseOSkills = cfg.RandomOptions.UseOSkills
+	defaultCfg.RandomizeMonsters = cfg.RandomOptions.RandomizeMonsters
 
 	cfg.RandomOptions.Seed = defaultCfg.Seed
 	return defaultCfg

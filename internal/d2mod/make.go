@@ -9,6 +9,7 @@ import (
 	"github.com/tlentz/d2modmaker/internal/d2mod/config"
 	"github.com/tlentz/d2modmaker/internal/d2mod/cows"
 	"github.com/tlentz/d2modmaker/internal/d2mod/monsterdensity"
+	"github.com/tlentz/d2modmaker/internal/d2mod/monsterrandomizer"
 	"github.com/tlentz/d2modmaker/internal/d2mod/qol"
 	"github.com/tlentz/d2modmaker/internal/d2mod/randomizer"
 	"github.com/tlentz/d2modmaker/internal/d2mod/splash"
@@ -73,6 +74,13 @@ func Make(defaultOutDir string, cfg config.Data) {
 
 	if cfg.RandomOptions.Randomize {
 		randomizer.Run(&cfg, d2files)
+	}
+	
+	fmt.Println("0")
+	
+	if cfg.RandomOptions.RandomizeMonsters {
+		fmt.Println("1")
+		monsterrandomizer.Run(&cfg, d2files)
 	}
 
 	d2files.Write()
